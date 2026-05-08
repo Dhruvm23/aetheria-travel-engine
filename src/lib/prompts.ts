@@ -19,8 +19,10 @@ RULES:
 6. Generate unique IDs for each activity using the pattern "act-{dayNumber}-{index}" (e.g., "act-1-1", "act-1-2").
 7. Set the itinerary ID to "itin-" followed by the destination slug (e.g., "itin-rome").
 8. Each day should have 4-6 activities with realistic timing (breakfast, morning activity, lunch, afternoon, dinner, optional evening).
-9. transitFromPrevious should be null for the first activity of each day.
-10. Respond ONLY with valid JSON matching the Itinerary schema. No markdown, no commentary.`;
+9. IMPORTANT: You MUST generate every single day from the start date to the end date. If the range is 8 days, you MUST generate exactly 8 objects in the "days" array. Do not truncate.
+10. transitFromPrevious should be null for the first activity of each day.
+11. Respond ONLY with valid JSON matching the Itinerary schema. No markdown, no commentary.
+`;
 
 export const DISRUPTION_SYSTEM_PROMPT = `You are Aetheria's Disruption Resolution Engine. Given an existing travel itinerary and a disruption event, you must intelligently adjust the itinerary to accommodate the disruption.
 
@@ -69,10 +71,15 @@ export function buildItineraryPrompt(request: TripRequest): string {
     .filter(Boolean)
     .join("; ");
 
+  const start = new Date(request.startDate);
+  const end = new Date(request.endDate);
+  const diffDays = Math.ceil(Math.abs(end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
   return `Generate a complete travel itinerary with the following parameters:
 
 DESTINATION: ${sanitizeInput(request.destination)}
 DATES: ${sanitizeInput(request.startDate)} to ${sanitizeInput(request.endDate)}
+TOTAL DAYS: ${diffDays} (You MUST generate all ${diffDays} days)
 BUDGET TIER: ${sanitizeInput(request.budget)}
 GROUP SIZE: ${request.groupSize}
 INTERESTS: ${request.interests.map(sanitizeInput).join(", ")}

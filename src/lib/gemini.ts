@@ -65,8 +65,10 @@ export async function generateStructuredJSON<T>(
     timeoutPromise
   ]);
 
-  // Sanitization: Strip potential Markdown code fences (even with responseMimeType, some models drift)
-  const cleanText = response.text.replace(/```json|```/g, "").trim();
+  // Sanitization: Strip potential Markdown code fences
+  // Using 'any' cast as some SDK type definitions lag behind the runtime property
+  const rawText = (response as any).text || "";
+  const cleanText = rawText.replace(/```json|```/g, "").trim();
 
   if (!cleanText) {
     throw new Error("[Aetheria] Gemini returned an empty response.");

@@ -1,8 +1,8 @@
-// ============================================================================
-// Dockerfile — Production-optimised Next.js (standalone) image
-// Build:   docker build -t aetheria .
-// Run:     docker run -p 3000:3000 --env-file .env.local aetheria
-// ============================================================================
+# ============================================================================
+# Dockerfile — Production-optimised Next.js (standalone) image
+# Build:   docker build -t aetheria .
+# Run:     docker run -p 3000:3000 --env-file .env.local aetheria
+# ============================================================================
 
 FROM node:20-alpine AS base
 

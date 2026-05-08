@@ -29,7 +29,7 @@ export function getGeminiClient(): GoogleGenAI {
 }
 
 /** Default model for all Aetheria AI calls */
-export const GEMINI_MODEL = "gemini-3-flash";
+export const GEMINI_MODEL = "gemini-3.1-flash-lite";
 
 /**
  * Helper: Generate structured JSON content from Gemini.

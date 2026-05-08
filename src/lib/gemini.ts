@@ -65,16 +65,19 @@ export async function generateStructuredJSON<T>(
     timeoutPromise
   ]);
 
-  const text = response.text;
-  if (!text) {
+  // Sanitization: Strip potential Markdown code fences (even with responseMimeType, some models drift)
+  const cleanText = response.text.replace(/```json|```/g, "").trim();
+
+  if (!cleanText) {
     throw new Error("[Aetheria] Gemini returned an empty response.");
   }
 
   try {
-    return JSON.parse(text) as T;
-  } catch {
+    return JSON.parse(cleanText) as T;
+  } catch (err) {
+    console.error("[Aetheria] JSON Parse Failure. Raw Text:", cleanText);
     throw new Error(
-      `[Aetheria] Failed to parse Gemini JSON response: ${text.slice(0, 200)}`
+      `[Aetheria] Failed to parse Gemini JSON response. Start of text: ${cleanText.slice(0, 100)}`
     );
   }
 }

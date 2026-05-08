@@ -224,7 +224,7 @@ export function TerrainRiskProfiler({
 
                 {/* Risk badge */}
                 {(() => {
-                  const cfg = RISK_CONFIG[assessment.riskLevel];
+                  const cfg = RISK_CONFIG[assessment.riskLevel] || RISK_CONFIG.moderate;
                   const RiskIcon = cfg.icon;
                   return (
                     <div

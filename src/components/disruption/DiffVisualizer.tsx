@@ -47,7 +47,7 @@ export function DiffVisualizer({ changes, reasoning }: DiffVisualizerProps) {
       {/* Change records */}
       <div className="space-y-2" role="list" aria-label="Changes applied to itinerary">
         {changes.map((change, i) => {
-          const config = CHANGE_CONFIG[change.changeType];
+          const config = CHANGE_CONFIG[change.changeType] || CHANGE_CONFIG.rescheduled;
           const Icon = config.icon;
 
           return (

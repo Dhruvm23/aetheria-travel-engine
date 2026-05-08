@@ -22,6 +22,7 @@ COPY . .
 
 # Standalone output is configured in next.config.ts
 ENV NEXT_TELEMETRY_DISABLED=1
+
 RUN npm run build
 
 # ── runner stage: minimal runtime image ────────────────────────────────────

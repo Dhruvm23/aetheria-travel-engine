@@ -28,18 +28,31 @@ export function useMap(): UseMapReturn {
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-    if (!apiKey) {
-      setIsError(true);
-      return;
-    }
     if (!mapRef.current) return;
 
     let isMounted = true;
 
     (async () => {
       try {
-        // @googlemaps/js-api-loader v2 — functional API
+        // 1. Resolve API key (from env or runtime fetch)
+        let apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+        
+        if (!apiKey) {
+          try {
+            const res = await fetch('/api/config');
+            const data = await res.json();
+            apiKey = data.googleMapsApiKey;
+          } catch (e) {
+            console.error('[useMap] Failed to fetch runtime config:', e);
+          }
+        }
+
+        if (!apiKey) {
+          if (isMounted) setIsError(true);
+          return;
+        }
+
+        // 2. Initialize Map via @googlemaps/js-api-loader v2
         const { setOptions, importLibrary } = await import('@googlemaps/js-api-loader');
 
         setOptions({

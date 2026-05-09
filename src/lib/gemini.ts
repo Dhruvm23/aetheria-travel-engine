@@ -46,8 +46,8 @@ export async function generateStructuredJSON<T>(
 
   const timeoutPromise = new Promise<never>((_, reject) => {
     setTimeout(() => {
-      reject(new Error("Gemini API Request Timeout (45s)"));
-    }, 45000);
+      reject(new Error("Gemini API Request Timeout (90s)"));
+    }, 90000);
   });
 
   const response = await Promise.race([
@@ -59,7 +59,7 @@ export async function generateStructuredJSON<T>(
         responseMimeType: "application/json",
         temperature: 0.7,
         topP: 0.9,
-        maxOutputTokens: 8192,
+        maxOutputTokens: 65536, // Increased from 8192 — full multi-day itineraries require large output
       },
     }),
     timeoutPromise
@@ -72,6 +72,13 @@ export async function generateStructuredJSON<T>(
 
   if (!cleanText) {
     throw new Error("[Aetheria] Gemini returned an empty response.");
+  }
+
+  // Truncation detection: if JSON is cut off, it won't end with } or ]
+  const lastChar = cleanText[cleanText.length - 1];
+  if (lastChar !== "}" && lastChar !== "]") {
+    console.error("[Aetheria] Truncated response detected. Last char:", lastChar, "| Length:", cleanText.length);
+    throw new Error("[Aetheria] Gemini response was truncated (output token limit hit). Try a shorter request.");
   }
 
   try {

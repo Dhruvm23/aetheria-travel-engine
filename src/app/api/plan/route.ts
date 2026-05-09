@@ -143,11 +143,13 @@ export async function POST(
     const cacheKey = generateCacheKey(tripRequest);
     console.log("[/api/plan] Request Cache Key:", cacheKey);
     
+    /*
     if (itineraryCache.has(cacheKey)) {
       console.log("[/api/plan] Cache Hit — Serving from memory");
       const cached = itineraryCache.get(cacheKey);
       return Response.json(cached, { status: 200 });
     }
+    */
 
     console.log("[/api/plan] Cache Miss — Initializing Gemini reasoning...");
 

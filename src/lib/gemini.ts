@@ -51,6 +51,9 @@ export async function generateStructuredJSON<T>(
     }, 90000);
   });
 
+  console.log("[Gemini] Starting content generation...");
+  const startTime = Date.now();
+
   try {
     const response = await Promise.race([
       ai.models.generateContent({
@@ -59,7 +62,7 @@ export async function generateStructuredJSON<T>(
         config: {
           systemInstruction: systemPrompt,
           responseMimeType: "application/json",
-          temperature: 0.7,
+          temperature: 0.1, // High determinism
           topP: 0.9,
           maxOutputTokens: 65536,
         },
@@ -67,10 +70,12 @@ export async function generateStructuredJSON<T>(
       timeoutPromise
     ]);
 
+    const duration = Date.now() - startTime;
+    console.log(`[Gemini] Generation completed in ${duration}ms`);
+
     if (timeoutId!) clearTimeout(timeoutId);
 
     // Sanitization: Strip potential Markdown code fences
-    // Using 'any' cast as some SDK type definitions lag behind the runtime property
     const rawText = (response as any).text || "";
     const cleanText = rawText.replace(/```json|```/g, "").trim();
 
@@ -78,23 +83,28 @@ export async function generateStructuredJSON<T>(
       throw new Error("[Aetheria] Gemini returned an empty response.");
     }
 
-    // Truncation detection: if JSON is cut off, it won't end with } or ]
+    console.log(`[Gemini] Response size: ${cleanText.length} bytes`);
+
+    // Truncation detection
     const lastChar = cleanText[cleanText.length - 1];
     if (lastChar !== "}" && lastChar !== "]") {
-      console.error("[Aetheria] Truncated response detected. Last char:", lastChar, "| Length:", cleanText.length);
-      throw new Error("[Aetheria] Gemini response was truncated (output token limit hit). Try a shorter request.");
+      console.error("[Aetheria] Truncated response detected. Last char:", lastChar);
+      throw new Error("[Aetheria] Gemini response was truncated.");
     }
 
     try {
-      return JSON.parse(cleanText) as T;
+      const parsed = JSON.parse(cleanText);
+      console.log("[Gemini] JSON Parse successful");
+      return parsed as T;
     } catch (err) {
-      console.error("[Aetheria] JSON Parse Failure. Raw Text:", cleanText);
+      console.error("[Aetheria] JSON Parse Failure. Raw Text snippet:", cleanText.slice(0, 500));
       throw new Error(
-        `[Aetheria] Failed to parse Gemini JSON response. Start of text: ${cleanText.slice(0, 100)}`
+        `[Aetheria] Failed to parse Gemini JSON response.`
       );
     }
   } catch (error) {
     if (timeoutId!) clearTimeout(timeoutId);
+    console.error("[Gemini] Generation failed:", error);
     throw error;
   }
 }

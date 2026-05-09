@@ -225,7 +225,7 @@ export function validatePocketGuideRequest(body: unknown): ValidationResult {
  */
 export function isValidItineraryShape(data: unknown): data is Itinerary {
   if (!data || typeof data !== "object") return false;
-  const obj = data as Record<string, unknown>;
+  const obj = data as Record<string, any>;
 
   return (
     isNonEmptyString(obj.id) &&
@@ -233,7 +233,8 @@ export function isValidItineraryShape(data: unknown): data is Itinerary {
     isNonEmptyString(obj.country) &&
     isNonEmptyString(obj.tripTitle) &&
     Array.isArray(obj.days) &&
-    obj.days.length > 0
+    obj.days.length > 0 &&
+    obj.days.every((d: any) => Array.isArray(d.activities))
   );
 }
 

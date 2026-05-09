@@ -103,7 +103,7 @@ export function DayCard({
         >
           <Thermometer size={12} className="text-[var(--accent-gold)]" aria-hidden="true" />
           <span className="text-[10px] font-semibold text-[var(--accent-gold)]">
-            {day.totalCost.currency} {day.totalCost.amount.toLocaleString()}
+            {day.totalCost?.currency ?? 'USD'} {(day.totalCost?.amount ?? 0).toLocaleString()}
           </span>
         </div>
 
@@ -168,7 +168,7 @@ export function DayCard({
                   Day Total
                 </span>
                 <span className="text-xs font-bold text-[var(--accent-gold)]">
-                  {day.totalCost.currency} {day.totalCost.amount.toLocaleString()}
+                  {day.totalCost?.currency ?? 'USD'} {(day.totalCost?.amount ?? 0).toLocaleString()}
                 </span>
               </div>
             </div>

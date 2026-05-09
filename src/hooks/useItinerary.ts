@@ -63,7 +63,10 @@ export function useItinerary(): UseItineraryReturn {
       setItinerary(data);
 
       // Fire confetti on successful itinerary load, do not block the UI
-      fireConfetti().catch(console.error);
+      // Use a small delay to ensure React has finished rendering the large itinerary list
+      setTimeout(() => {
+        fireConfetti().catch(console.error);
+      }, 1000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
     } finally {

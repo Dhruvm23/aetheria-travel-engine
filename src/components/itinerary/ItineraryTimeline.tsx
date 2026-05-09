@@ -97,12 +97,12 @@ export function ItineraryTimeline({
         </p>
         <div className="flex items-center gap-3 mt-3 flex-wrap">
           <span className="text-xs px-2.5 py-1 rounded-full bg-[var(--accent-gold-subtle)] text-[var(--accent-gold)] font-semibold">
-            {itinerary.totalEstimatedCost.currency} {itinerary.totalEstimatedCost.amount.toLocaleString()} total
+            {itinerary.totalEstimatedCost?.currency ?? 'USD'} {(itinerary.totalEstimatedCost?.amount ?? 0).toLocaleString()} total
           </span>
           <span className="text-xs text-[var(--text-muted)]">
-            {new Date(itinerary.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            {itinerary.startDate ? new Date(itinerary.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'TBD'}
             {' — '}
-            {new Date(itinerary.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            {itinerary.endDate ? new Date(itinerary.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD'}
           </span>
           <button
             onClick={handleSave}

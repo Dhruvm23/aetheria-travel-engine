@@ -54,10 +54,10 @@ export function ActivityCard({
 }: ActivityCardProps) {
   const Icon = CATEGORY_ICONS[activity.category] ?? Landmark;
   const categoryColor = CATEGORY_COLORS[activity.category] ?? '#d4a853';
-  const costInfo = COST_TIER_DISPLAY[activity.estimatedCost.tier];
-  const mobilityLabel = MOBILITY_RATING_LABEL[activity.accessibilityInfo.mobilityRating];
+  const costInfo = COST_TIER_DISPLAY[activity.estimatedCost.tier] || COST_TIER_DISPLAY.moderate;
+  const mobilityLabel = MOBILITY_RATING_LABEL[activity.accessibilityInfo.mobilityRating] || 'Moderate';
 
-  const cardLabel = `${activity.name}, ${activity.category}, from ${activity.startTime} to ${activity.endTime}, cost ${activity.estimatedCost.amount} ${activity.estimatedCost.currency}, mobility: ${mobilityLabel}`;
+  const cardLabel = `${activity.name}, ${activity.category}, from ${activity.startTime} to ${activity.endTime}, cost ${activity.estimatedCost?.amount ?? 0} ${activity.estimatedCost?.currency ?? 'USD'}, mobility: ${mobilityLabel}`;
 
   return (
     <motion.article

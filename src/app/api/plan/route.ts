@@ -134,12 +134,22 @@ export async function POST(
     }
     tripRequest = body as TripRequest;
 
-    // Cache Check
-    const cacheKey = generateCacheKey(tripRequest);
-    if (itineraryCache.has(cacheKey)) {
-      console.log("[Cache Hit] Serving from memory");
-      return Response.json(itineraryCache.get(cacheKey), { status: 200 });
+    // Cache Check (with simple eviction to prevent OOM)
+    if (itineraryCache.size > 100) {
+      console.log("[/api/plan] Cache size exceeded 100. Clearing for memory safety.");
+      itineraryCache.clear();
     }
+
+    const cacheKey = generateCacheKey(tripRequest);
+    console.log("[/api/plan] Request Cache Key:", cacheKey);
+    
+    if (itineraryCache.has(cacheKey)) {
+      console.log("[/api/plan] Cache Hit — Serving from memory");
+      const cached = itineraryCache.get(cacheKey);
+      return Response.json(cached, { status: 200 });
+    }
+
+    console.log("[/api/plan] Cache Miss — Initializing Gemini reasoning...");
 
     // Test Backdoor for E2E Cache Testing
     if (tripRequest.specialRequirements?.includes("test-cache-key")) {
